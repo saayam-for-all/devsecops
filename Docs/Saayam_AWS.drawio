@@ -1,0 +1,82 @@
+<mxfile host="app.diagrams.net" modified="2024-07-05T18:48:22.161Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36" version="24.6.4" etag="YxuNNIHNJgAHsP5YdV0i" type="device">
+  <diagram id="_JOBukSen8tSIEHADYFu" name="Page-1">
+    <mxGraphModel dx="2284" dy="786" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-1" value="AWS Cloud" style="rounded=0;whiteSpace=wrap;html=1;labelPosition=left;verticalLabelPosition=top;align=right;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="-120" y="50" width="910" height="580" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="ENQYq0kZE0MXRLzni3ol-8" target="ENQYq0kZE0MXRLzni3ol-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-8" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="-320" y="445" width="20" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="ENQYq0kZE0MXRLzni3ol-12" target="ENQYq0kZE0MXRLzni3ol-22">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-195" y="120" as="targetPoint" />
+            <mxPoint x="-200" y="430" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="-195" y="120" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="ENQYq0kZE0MXRLzni3ol-12" target="ENQYq0kZE0MXRLzni3ol-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-12" value="Route 53" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="-220" y="440" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-19" value="Ireland region. Same as Northern Virginia region" style="rounded=0;whiteSpace=wrap;html=1;labelPosition=center;verticalLabelPosition=middle;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="240" y="60" width="250" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-20" value="Northern Virginia Region" style="rounded=0;whiteSpace=wrap;html=1;labelPosition=left;verticalLabelPosition=top;align=right;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="20" y="200" width="660" height="410" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-21" value="API GW" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry y="445" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-22" value="API GW" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="210" y="100" width="40" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-25" value="VPC" style="rounded=0;whiteSpace=wrap;html=1;labelPosition=left;verticalLabelPosition=top;align=right;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="80" y="230" width="570" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-26" value="Availability&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;Zone A&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;labelPosition=center;verticalLabelPosition=top;align=center;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="70" y="250" width="590" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-27" value="Availability Zone B" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;fillColor=none;labelPosition=center;verticalLabelPosition=top;align=center;verticalAlign=bottom;" vertex="1" parent="1">
+          <mxGeometry x="60" y="430" width="600" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-29" value="Public Subnet 1&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Frontend&lt;/div&gt;&lt;div&gt;NAT Gateway&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="270" width="140" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-31" value="Private Subnet 1&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;EKS fargate&lt;/div&gt;&lt;div&gt;VPC Endpoint&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="270" width="140" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-32" value="Private Subnet 3&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Aurora&lt;/div&gt;&lt;div&gt;VPC Endpoint&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="270" width="140" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-33" value="Public Subnet 2&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Frontend&lt;br&gt;&lt;/div&gt;&lt;div&gt;NAT Gateway&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="450" width="140" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-34" value="Private Subnet 2&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;EKS fargate&lt;br&gt;&lt;/div&gt;&lt;div&gt;VPC Endpoint&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="450" width="140" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-35" value="Private Subnet 4&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Aurora&lt;/div&gt;&lt;div&gt;VPC Endpoint&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="480" y="450" width="140" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-36" value="Web Layer" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="130" y="360" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-37" value="Application Layer" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="280" y="360" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ENQYq0kZE0MXRLzni3ol-38" value="DB Layer" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="520" y="360" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
