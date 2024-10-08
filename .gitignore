@@ -444,3 +444,4 @@ bundles/
 vendor/pkg/
 pyenv
 Vagrantfile
+pulumi-scripts/kubeconfig
