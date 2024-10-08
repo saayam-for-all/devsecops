@@ -2,18 +2,33 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as eks from "@pulumi/eks";
-
+import {SeededRandom} from "./utils/randomid"
 
 const config = new pulumi.Config();
 const region = aws.config.region || "us-west-2";
-const vpcName = config.get("vpcName") || "eks-vpc-divya"
 
+const eksSeed = Number(config.get("eksSeed")) || 12345
+const generator = new SeededRandom(eksSeed);
+const alphanumericString = generator.generateAlphanumeric(5);
+const vpcName = config.get("vpcName") || `vpc-${alphanumericString}`
+const eksClusterName = config.get("eksClusterName") || `saayam-${alphanumericString}`
 
 // //Create VPC
 const vpc = new awsx.ec2.Vpc(vpcName, {
     numberOfAvailabilityZones: 2,
     cidrBlock: "10.0.0.0/24",
-    
+    subnetStrategy:"Auto",
+    subnetSpecs: [
+        {
+            type: "Public",
+            tags:{
+                "kubernetes.io/role/elb":"1"
+            },
+        },
+        {
+            type: "Private",
+        }
+    ]
 });
 
 // Define the assume role policy for EKS
@@ -32,12 +47,12 @@ const assumeRolePolicy = {
 
 
 // Create the IAM Role for EKS
-const eksRole = new aws.iam.Role("divyaEksRole", {
+const eksRole = new aws.iam.Role(`EksRole-${alphanumericString}`, {
     assumeRolePolicy: JSON.stringify(assumeRolePolicy)
 });
 
 // Attach the AmazonEKSClusterPolicy to the EKS Role
-const eksPolicyAttachment = new aws.iam.RolePolicyAttachment("eksPolicyAttachment", {
+const eksPolicyAttachment = new aws.iam.RolePolicyAttachment(`EksPolicyAttachment-${alphanumericString}`, {
     role: eksRole.name,
     policyArn: "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 });
@@ -55,18 +70,18 @@ const fargateRolePolicy = {
     ]
   }
 
-const eksFargateRole = new aws.iam.Role("divyaFargateEksRole",{
+const eksFargateRole = new aws.iam.Role(`FargateEksRole-${alphanumericString}`,{
     assumeRolePolicy: JSON.stringify(fargateRolePolicy)
 });
 
-const eksFargatePolicyAttachment = new aws.iam.RolePolicyAttachment("eksFargatePolicyAttachment", {
+const eksFargatePolicyAttachment = new aws.iam.RolePolicyAttachment(`EksFargatePolicyAttachment-${alphanumericString}`, {
     role: eksFargateRole.name,
     policyArn: "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
 });
 
 
 // Create the EKS Cluster
-const cluster = new eks.Cluster("divya", {
+const cluster = new eks.Cluster(eksClusterName, {
     vpcId: vpc.vpcId,
     publicSubnetIds:vpc.publicSubnetIds,
     privateSubnetIds: vpc.privateSubnetIds,
@@ -81,7 +96,7 @@ const cluster = new eks.Cluster("divya", {
 });
 
 // Create an EKS Fargate Profile
-const fargateProfile = new aws.eks.FargateProfile("divya-fargate-profile", {
+const fargateProfile = new aws.eks.FargateProfile(`FargateProfile-${alphanumericString}`, {
     clusterName: cluster.eksCluster.name,
     podExecutionRoleArn: eksFargateRole.arn,
     selectors: [{
@@ -337,10 +352,12 @@ const albControllerPolicy = {
     ]
 }
 
-const albPolicy = new aws.iam.Policy("DivyaALBControllerPolicy",{
+const albPolicy = new aws.iam.Policy(`ALBControllerPolicy-${alphanumericString}`,{
     policy: JSON.stringify(albControllerPolicy)
 })
 
+export const vpcId = vpc.vpcId
+export const clusterName = cluster.eksCluster.name
 export const privateSubnetIds = vpc.privateSubnetIds
 export const publicSubnetIds = vpc.publicSubnetIds
 export const kubeconfig = cluster.kubeconfig;
