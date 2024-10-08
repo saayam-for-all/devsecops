@@ -59,4 +59,3 @@
    kubectl get deployment
    kubectl apply -f ingress.yml
    ```
-4. 
