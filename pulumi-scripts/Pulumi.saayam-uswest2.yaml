@@ -1,4 +1,0 @@
-config:
-  aws:region: us-west-2
-  eksSeed: 12345
-  eksClusterName: sample

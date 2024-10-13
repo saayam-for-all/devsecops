@@ -7,11 +7,11 @@ import {SeededRandom} from "./utils/randomid"
 const config = new pulumi.Config();
 const region = aws.config.region || "us-west-2";
 
-const eksSeed = Number(config.get("eksSeed")) || 12345
+const eksSeed = Number(config.get("eksSeed")) || 12346
 const generator = new SeededRandom(eksSeed);
 const alphanumericString = generator.generateAlphanumeric(5);
-const vpcName = config.get("vpcName") || `vpc-${alphanumericString}`
-const eksClusterName = config.get("eksClusterName") || `saayam-${alphanumericString}`
+const vpcName = config.get("vpcName") || `eks-vpc-${alphanumericString}`
+const eksClusterName = config.get("eksClusterName") || `eks-saayam-${alphanumericString}`
 
 // //Create VPC
 const vpc = new awsx.ec2.Vpc(vpcName, {

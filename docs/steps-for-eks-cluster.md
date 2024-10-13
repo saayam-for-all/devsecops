@@ -26,12 +26,9 @@
    cd pulumi-scripts
    pulumi up
    pulumi stack output kubeconfig > kubeconfig
-   pulumi stack output clusterName
-   export CLUSTER_NAME="<CLUSTER_NAME>"
-   pulumi stack output vpcId
-   export VPC_ID="<VPC_ID>"
-   pulumi stack output albPolicyArn
-   export ALB_POLICY_ARN="<albPolicyArn>"
+   export CLUSTER_NAME=$(pulumi stack output clusterName)
+   export VPC_ID=$(pulumi stack output vpcId)
+   export ALB_POLICY_ARN=$(pulumi stack output albPolicyArn)
    aws eks update-kubeconfig --region us-west-2 --name $CLUSTER_NAME
    # Fix Failed CoreDNS
    kubectl rollout restart -n kube-system deployment coredns
@@ -56,6 +53,7 @@
    kubectl apply -f service.yml  
    kubectl get po -A -w
    kubectl get deploy -n kube-system   
-   kubectl get deployment
+   kubectl get deployment -n kube-system
    kubectl apply -f ingress.yml
+   kubectl delete deployment demo-dp -n kube-system
    ```
