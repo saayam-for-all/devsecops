@@ -2,9 +2,7 @@ name: FastAPI CI CD
 
 on:
   # Trigger the workflow on push or pull request,
-  push:
-    branches:
-      - feature/divyatanwar/aws-lambda-function-deploy
+  - pull_request
 env:
     AWS_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
     AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
