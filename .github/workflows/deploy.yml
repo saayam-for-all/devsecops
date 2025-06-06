@@ -1,0 +1,30 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - sonarqube-test
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: SonarQube scan
+        uses: sonarsource/sonarqube-scan-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      - name: Copy files to local app directory
+        run: |
+          mkdir -p ~/app
+          cp -r * ~/app/
+
+      - name: Run start.sh to deploy
+        run: |
+          chmod +x ~/app/start.sh
+          ~/app/start.sh
+
