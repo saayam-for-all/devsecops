@@ -1,5 +1,4 @@
-@@ -1,7 +1,10 @@
- # Saayam Test Application – Architecture & Operational Flow (UI-Focused)
+# Saayam Test Application – Architecture & Operational Flow (UI-Focused)
 
  **Version:** 1.0  
  **Owners:** Engineer A (UI Lead), Engineer B (AWS/Backend Lead)  
