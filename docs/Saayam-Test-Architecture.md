@@ -32,14 +32,3 @@ flowchart LR
     E --> G
     F --> H[S3 - History Data]
 ---
-
-## 3. Dependencies & Environments
-
-| Item           | Detail                                  |
-|----------------|-----------------------------------------|
-| Hosting        | Netlify (test environment)              |
-| API Base URL   | https://<api-base>/v1                   |
-| Auth Provider  | TBD (handled by backend)                |
-| Auth Storage   | Access token in localStorage/session    |
-| Roles          | Volunteer, Beneficiary                  |
-| Env Vars Used  | VITE_API_URL, VITE_ENV                  |
