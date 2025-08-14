@@ -33,8 +33,8 @@ flowchart LR
     F --> H[S3 - History Data]
 ---
 
-```mermaid
-## 3. Dependencies & Environments
+
+```## 3. Dependencies & Environments
 
 | Item           | Detail                                  |
 |----------------|-----------------------------------------|
