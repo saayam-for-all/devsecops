@@ -1,52 +1,65 @@
-# Saayam Test Application – Architecture & Operational Flow (AWS/Backend-Focused)
+# Saayam Test Application – Full Architecture & Operational Flow
 
 **Version:** 1.0  
-**Owners:** Engineer B (AWS/Backend Lead), Engineer A (UI Lead)  
-**Scope:** This document focuses **only on backend architecture, AWS services, and infrastructure flows**. UI architecture and flows are documented separately by Engineer A.  
+**Owners:** Engineer A (UI Lead), Engineer B (AWS/Backend Lead)  
+**Scope:** This document covers **UI architecture and flows** as well as **AWS backend architecture and infrastructure** for the Saayam Test Application.  
 
 **Last Updated:** 2025-08-13  
 
 ---
 
 ## 1. Overview
-The backend of the Saayam Test Application is hosted on **AWS** and exposes APIs to the UI via **API Gateway**. It handles authentication, request processing, notifications, donations, and data storage. The services run inside an **Amazon EKS (Kubernetes)** cluster for scalability and high availability.
+The Saayam Test Application is composed of two main parts:  
+1. **Frontend/UI** – A React single-page application (SPA) hosted on Netlify.  
+2. **Backend** – AWS-hosted services, deployed via Amazon EKS (Kubernetes), exposing APIs via API Gateway.  
 
+It supports volunteers and beneficiaries to create, manage, and fulfill help requests.  
 This document covers:
-- **AWS infrastructure**.
-- **Backend service interactions**.
-- **Deployment pipeline overview**.
+- **UI flows**.
+- **How the UI communicates with backend APIs**.
+- **AWS infrastructure & backend services**.
+- **Deployment considerations**.
 
 ---
 
-## 2. High-Level Architecture (AWS Context)
-> The backend portion is: **API Gateway → AWS Services (EKS, RDS, S3, SNS/SQS)**.
+## 2. High-Level Architecture (Combined View)
 
 ```mermaid
 flowchart LR
-    A[Netlify - React SPA] -->|HTTPS| B[API Gateway]
-    B --> C[Auth Service - EKS]
-    B --> D[Volunteer Service - EKS]
-    B --> E[Request Service - EKS]
-    B --> F[Notification Service - EKS]
-    C --> G[(Aurora RDS)]
-    D --> G
-    E --> G
-    F --> H[SNS/SQS - Notifications Queue]
-    E --> I[S3 - File Storage]
-    subgraph AWS Infrastructure
-        C
-        D
-        E
-        F
-        G
-        H
-        I
+    subgraph Frontend/UI
+        A[User Browser] -->|HTTPS| B[Netlify - React SPA]
+    end
+
+    subgraph Backend/AWS
+        B -->|API calls| C[API Gateway]
+        C --> D[Auth Service - EKS]
+        C --> E[Volunteer Service - EKS]
+        C --> F[Request Service - EKS]
+        C --> G[Notification Service - EKS]
+        E --> H[S3 - File Storage]
+        D --> I[(Aurora RDS)]
+        E --> I
+        F --> I
+        G --> J[SNS/SQS - Notifications Queue]
     end
 ```
 
 ---
 
-## 3. Dependencies & Environments
+## 3. UI Dependencies & Environments
+
+| Item           | Detail                                  |
+|----------------|-----------------------------------------|
+| Hosting        | Netlify (test environment)              |
+| API Base URL   | https://<api-base>/v1                   |
+| Auth Provider  | TBD (handled by backend)                |
+| Auth Storage   | Access token in localStorage/session    |
+| Roles          | Volunteer, Beneficiary                  |
+| Env Vars Used  | VITE_API_URL, VITE_ENV                  |
+
+---
+
+## 4. Backend Dependencies & Environments
 
 | Item           | Detail                                             |
 |----------------|----------------------------------------------------|
@@ -60,7 +73,19 @@ flowchart LR
 
 ---
 
-## 4. Backend ↔ External Touchpoints
+## 5. UI ↔ API Touchpoints
+
+| UI Page/Flow         | Action                   | API Endpoint (example) |
+|----------------------|--------------------------|-------------------------|
+| Login                | Authenticate user        | POST /auth/login        |
+| Volunteer Dashboard  | Fetch “My Requests”      | GET /requests?me        |
+| Create Help Request  | Submit new request       | POST /requests          |
+| Notifications        | Fetch latest updates     | GET /notifications      |
+| Donate               | Process payment          | POST /donate            |
+
+---
+
+## 6. Backend ↔ External Touchpoints
 
 | Integration Type   | Purpose                                        | Example Service          |
 |--------------------|------------------------------------------------|--------------------------|
@@ -71,7 +96,23 @@ flowchart LR
 
 ---
 
-## 5. Deployment Flow
+## 7. UI Flow: Login → Dashboard
+
+```mermaid
+flowchart LR
+    A[User] --> B[Login Form]
+    B -->|POST /auth/login| C{Auth OK?}
+    C -- No --> B
+    C -- Yes --> D{Role}
+    D -- Volunteer --> E[Volunteer Dashboard]
+    D -- Beneficiary --> F[Beneficiary Dashboard]
+    E -->|API calls| G[Request Service]
+    F -->|API calls| G[Request Service]
+```
+
+---
+
+## 8. Deployment Flow
 
 ```mermaid
 flowchart TD
@@ -85,5 +126,6 @@ flowchart TD
 
 ---
 
-**Note:** AWS Infrastructure & Backend API details are documented separately by **Engineer B (AWS Lead)**.  
-**UI architecture and flows** are documented separately by **Engineer A (UI Lead)**.
+**Note:**  
+- AWS Infrastructure & Backend API details are documented and maintained by **Engineer B (AWS Lead)**.  
+- UI architecture and flows are documented and maintained by **Engineer A (UI Lead)**.
