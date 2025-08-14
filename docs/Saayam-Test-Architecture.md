@@ -33,8 +33,7 @@ flowchart LR
     F --> H[S3 - History Data]
 ---
 
-
-```## 3. Dependencies & Environments
+## 3. Dependencies & Environments
 
 | Item           | Detail                                  |
 |----------------|-----------------------------------------|
@@ -44,15 +43,3 @@ flowchart LR
 | Auth Storage   | Access token in localStorage/session    |
 | Roles          | Volunteer, Beneficiary                  |
 | Env Vars Used  | VITE_API_URL, VITE_ENV                  |
-
----
-
-## 4. UI ↔ API Touchpoints
-
-| UI Page/Flow         | Action                   | API Endpoint (example) |
-|----------------------|--------------------------|-------------------------|
-| Login                | Authenticate user        | POST /auth/login        |
-| Volunteer Dashboard  | Fetch “My Requests”      | GET /requests?me        |
-| Create Help Request  | Submit new request       | POST /requests          |
-| Notifications        | Fetch latest updates     | GET /notifications      |
-| Donate               | Process payment          | POST /donate            |
