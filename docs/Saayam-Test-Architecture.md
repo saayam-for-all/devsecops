@@ -31,4 +31,4 @@ flowchart LR
     D --> G[(Relational Database - Aurora)]
     E --> G
     F --> H[S3 - History Data]
----
+
