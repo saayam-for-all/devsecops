@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools >= 61.0","wheel>=0.42.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "sample_fastapi"
+requires-python = ">= 3.11.3"
+version = "0.1.0"
+description = "Sample FastAPI"
+authors = [
+    { name = "Divya Tanwar", email = "divya.tanwar@outlook.com" },
+]
+readme = "README.md"
+keywords = ["sample_fastapi"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    # List your project dependencies here
+    # For example: "requests>=2.25.1",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.28.0",
+    "python-multipart>=0.0.9",
+    "PyJWT>=2.8.0",
+    "certifi==2024.2.2",
+    "loguru==0.7.2",
+    "pydantic[email]",
+    "passlib==1.7.4",
+    "bcrypt==4.0.1",
+    "gunicorn",
+]
+
+[project.urls]
+Homepage = "https://example.com/sample_fastapi"
+Repository = "https://github.com/yourusername/sample_fastapi"
+Documentation = "https://sample_fastapi.readthedocs.io"
