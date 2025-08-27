@@ -1,17 +1,19 @@
 import { test, expect, Page } from '@playwright/test';
 
+// Force desktop so the full navbar is present (no hamburger)
 async function ensureDesktop(page: Page) {
-  // force desktop so the top navbar (not hamburger) is present
   await page.setViewportSize({ width: 1440, height: 900 });
 }
 
-/** open the About Us dropdown (works whether it's a link or a button) */
-async function openAboutDropdown(page: Page) {
-  const aboutBtn = page.getByRole('button', { name: /about us/i }).first();
-  const aboutLink = page.getByRole('link', { name: /about us/i }).first();
-  const trigger = (await aboutBtn.count()) ? aboutBtn : aboutLink;
+async function openDropdown(page: Page, labelRe: RegExp) {
+  // The trigger can be a button or a link (MUI menu)
+  const btn  = page.getByRole('button', { name: labelRe }).first();
+  const link = page.getByRole('link',   { name: labelRe }).first();
+  const trigger = (await btn.count()) ? btn : link;
   await trigger.scrollIntoViewIfNeeded();
-  await trigger.click({ timeout: 15000 });
+  await trigger.click();
+  // Wait for the menu to render
+  await expect(page.getByRole('menu')).toBeVisible({ timeout: 5000 });
 }
 
 test('home page shows hero text', async ({ page, baseURL }) => {
@@ -20,40 +22,72 @@ test('home page shows hero text', async ({ page, baseURL }) => {
   await expect(page.getByText(/Need help\?\s*Here to help\?/i)).toBeVisible();
 });
 
-test('About Us dropdown → Our Team & Our Mission', async ({ page, baseURL }) => {
+/* -------------------- ABOUT US -------------------- */
+test('About Us → Our Team', async ({ page, baseURL }) => {
   await ensureDesktop(page);
   await page.goto(baseURL!);
 
-  // Our Team
-  await openAboutDropdown(page);
-  await page.getByRole('menuitem', { name: /our team/i }).first().click({ timeout: 15000 });
-  await expect(page).toHaveURL(/\/our-team/i, { timeout: 15000 });
-  await expect(page.getByRole('heading', { name: /our team/i })).toBeVisible();
+  await openDropdown(page, /about us/i);
+  await page.getByRole('menuitem', { name: /our team/i }).first().click();
 
-  // Our Mission
-  await page.goto(baseURL!);
-  await openAboutDropdown(page);
-  await page.getByRole('menuitem', { name: /our mission/i }).first().click({ timeout: 15000 });
-  await expect(page).toHaveURL(/\/our-mission/i, { timeout: 15000 });
-  await expect(page.getByRole('heading', { name: /our mission/i })).toBeVisible();
+  await expect(page).toHaveURL(/\/our-team/i, { timeout: 15000 });
+  // Actual heading on the page
+  await expect(page.getByRole('heading', { name: /Meet the Board of Directors/i }))
+    .toBeVisible();
 });
 
+test('About Us → Our Mission', async ({ page, baseURL }) => {
+  await ensureDesktop(page);
+  await page.goto(baseURL!);
+
+  await openDropdown(page, /about us/i);
+  await page.getByRole('menuitem', { name: /our mission/i }).first().click();
+
+  await expect(page).toHaveURL(/\/our-mission/i, { timeout: 15000 });
+  await expect(page.getByRole('heading', { name: /Our Mission/i })).toBeVisible();
+});
+
+/* --------------- VOLUNTEER SERVICES --------------- */
+test('Volunteer Services → How We Operate', async ({ page, baseURL }) => {
+  await ensureDesktop(page);
+  await page.goto(baseURL!);
+
+  await openDropdown(page, /volunteer services/i);
+  await page.getByRole('menuitem', { name: /how we operate/i }).first().click();
+
+  // If there is a dedicated route, assert it here; otherwise just assert heading.
+  await expect(page.getByRole('heading', { name: /How We Operate/i }))
+    .toBeVisible({ timeout: 15000 });
+});
+
+test('Volunteer Services → Our Collaborators', async ({ page, baseURL }) => {
+  await ensureDesktop(page);
+  await page.goto(baseURL!);
+
+  await openDropdown(page, /volunteer services/i);
+  await page.getByRole('menuitem', { name: /our collaborators/i }).first().click();
+
+  await expect(page.getByRole('heading', { name: /Our Collaborators/i }))
+    .toBeVisible({ timeout: 15000 });
+});
+
+/* ---------------- CONTACT & DONATE ---------------- */
 test('Contact Us navigates to contact page', async ({ page, baseURL }) => {
   await ensureDesktop(page);
   await page.goto(baseURL!);
+
   await page.getByRole('link', { name: /contact us/i }).first().click();
+
   await expect(page).toHaveURL(/\/contact/i, { timeout: 15000 });
-  await expect(page.getByRole('heading', { name: /contact/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Contact Us/i })).toBeVisible();
 });
 
 test('Donate navigates to internal donate page', async ({ page, baseURL }) => {
   await ensureDesktop(page);
   await page.goto(baseURL!);
 
-  // On this site Donate is a button that routes to /donate (same origin)
-  const donateBtn = page.getByRole('button', { name: /donate/i }).first();
-  await donateBtn.click({ timeout: 15000 });
+  await page.getByRole('button', { name: /donate/i }).first().click();
 
   await expect(page).toHaveURL(/\/donate/i, { timeout: 15000 });
-  await expect(page.getByRole('heading', { name: /make a donation/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Make a donation/i })).toBeVisible();
 });
