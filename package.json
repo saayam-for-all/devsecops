@@ -4,11 +4,17 @@
   "description": "Node.js CI/CD test app for EC2 deployment",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "npx playwright test"
   },
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
     "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.0",
+    "dotenv": "^17.2.1"
   }
 }
