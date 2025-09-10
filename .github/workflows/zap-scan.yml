@@ -2,7 +2,7 @@ name: DAST Scan
 
 on:
   push:
-    branches: [ qa ]
+    branches: [ qa, owasp-zap ]
   pull_request:
     branches: [ qa ]
 
