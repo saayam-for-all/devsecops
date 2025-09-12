@@ -71,7 +71,7 @@ Prints a report for all original compliant buckets, non-compliant buckets and up
             ],
             "Resource": [
                 "*",
-                "arn:aws:sns:ca-central-1:304906330544:s3-sns-topic"
+                "arn:aws:sns:<REGION>:<ACCOUNT>:<TOPIC>"
             ]
         }
     ]
