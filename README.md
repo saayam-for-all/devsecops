@@ -13,14 +13,32 @@ Ensure all S3 buckets stay compliant with AWS security best practices daily, wit
 The script can be run using EC2 SSH via VSCode. See **How to test** section to run this script in your own EC2 environment to test.
 
 ### Public Access Block
-Checks all buckets for PAB policies - see function`check_bucket_bpa(bucket_name)` in the `lambda_handler` function. The **DESIRED_BPA** dict shows the desired Block Public Access to ensure security and compliance. When each bucket's PAB setting is checked, it is checked against the **DESIRED_BPA** and if it does not have the same values it is added to the **NON_COMPLIANT_BUCKETS**. Otherwise a PAB bucket is added to the **ORIGINAL_COMPLIANT_BUCKETS**. This is done for easy reporting at the end. 
+Checks all buckets for PAB policies - see function`enforce_bucket_pab(bucket_name)` in the `lambda_handler` function. The **DESIRED_BPA** dict shows the desired Block Public Access to ensure security and compliance. When each bucket's PAB setting is checked, it is checked against the **DESIRED_BPA** and if it does not have the same values it is added to the **NON_COMPLIANT_BUCKETS**. Otherwise a PAB bucket is added to the **ORIGINAL_COMPLIANT_BUCKETS**. This is done for easy reporting at the end. 
 
 Once a bucket's PAB settings is updated, it is added to **UDPATED_BUCKETS**. Again, this is to visualize the report at the end which can help us understand how many buckets were originally compliant, how many were non-compliant and how many were updated.
+
+### Server Side Encryption - Default Encryption Enabled
+Checks all buckets for ServerSideEncryption - see function `enforce_default_encryption(bucket_name)` in the `lambda_handler` function. We check for `SSEAlgorithm = SSE-S3` or `SSEAlgorithm = aws:kms` (for KMS keys). If they are not existing, the code can enforce the appropriate settings when `DRY_RUN=false`.
+
+The following is the desired encryption to be compliant:
+```json
+DESIRED_ENCRYPTION = {
+            "Rules": [{
+                "ApplyServerSideEncryptionByDefault": {
+                    "SSEAlgorithm": "AES256"
+                }
+            }]
+        }
+```
 
 ### Report
 Prints a report for all original compliant buckets, non-compliant buckets and updated compliant buckets. Currently the report only display BPA checks.
 
-## To-Dos:
+### SNS - Email
+Sends an email to the subscribed SNS topic with any non-compliant buckets.
+
+### To-Dos on Saayam Account:
+To perform this on the Saayam account, the following need to be completed/performed.
 - Still need to update the other settings in the script.
 - Create the IAM Roles in Saayam AWS environment
 - Create the Lambda functions with the script zipped file in Saayam AWS environment
@@ -45,7 +63,8 @@ Prints a report for all original compliant buckets, non-compliant buckets and up
                 "s3:GetEncryptionConfiguration",
                 "s3:PutBucketVersioning",
                 "s3:PutBucketPolicy",
-                "s3:PutBucketPublicAccessBlock"
+                "s3:PutBucketPublicAccessBlock",
+                "s3:PutEncryptionConfiguration"
             ],
             "Resource": [
                 "*"
@@ -74,14 +93,14 @@ Prints a report for all original compliant buckets, non-compliant buckets and up
                 "arn:aws:sns:<REGION>:<ACCOUNT>:<TOPIC>"
             ]
         }
-    ]
-  }
-
+    ]}
+  
 3. Spin up an EC2 instance and attach the IAM policy
 4. Access your EC2 instance via the VSCode SSH
 5. Create dummy buckets with different permissions for testing
 6. Install the necessary python libraries (e.g. boto3)
 7. Create a new file in the directory (e.g. `s3security.py`)
-8. Run the following command for testing: `DRY_RUN=true python3 s3security.py`. **Ensure DRY_RUN is set to TRUE otherwise the code will actually update the bucket policies.**
-9. To test if the script actually updates the bucket policies run the folowing command for testing: `DRY_RUN=false python3 s3security.py`
+8. Update the `CONFIG_SNS_TOPIC_ARN` and `CONFIG_REGION` to your test account's environment
+9. Run the following command for testing: `DRY_RUN=true python3 s3security.py`. **Ensure DRY_RUN is set to TRUE otherwise the code will actually update the bucket policies.**
+10. To test if the script actually updates the bucket policies run the folowing command for testing: `DRY_RUN=false python3 s3security.py`
 
