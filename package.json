@@ -1,24 +1,13 @@
 {
   "name": "ci-cd-sample-app",
   "version": "1.0.0",
-<<<<<<< HEAD
-  "description": "Node.js CI/CD test app for EC2 deployment",
-  "main": "app.js",
-=======
   "description": "Node.js CI/CD test app for EC2 deployment with Playwright smoke tests",
   "main": "app.js",
-  "directories": {
-    "doc": "docs"
-  },
->>>>>>> df43c00 (Fix package.json merge conflict and add Playwright smoke tests)
   "scripts": {
     "start": "node app.js",
     "test": "npx playwright test"
   },
-<<<<<<< HEAD
-=======
   "keywords": [],
->>>>>>> df43c00 (Fix package.json merge conflict and add Playwright smoke tests)
   "author": "Your Name",
   "license": "ISC",
   "dependencies": {
