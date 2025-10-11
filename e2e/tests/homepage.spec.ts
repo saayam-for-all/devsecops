@@ -4,5 +4,5 @@ test('homepage has title and links', async ({ page }) => {
   await page.goto('https://example.com');
   await expect(page).toHaveTitle(/Example Domain/);
   const link = page.locator('a');
-  await expect(link).toHaveAttribute('href', 'https://www.iana.org/domains/example');
+  await expect(link).toHaveAttribute('href', 'https://iana.org/domains/example');
 });
