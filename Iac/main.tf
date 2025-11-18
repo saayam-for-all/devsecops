@@ -1,62 +1,45 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-  required_version = ">= 1.0"
+# ============================================================
+# IAM User
+# ============================================================
+resource "aws_iam_user" "dev_user" {
+  name = var.user_name
 }
 
-provider "aws" {
-  region = "us-east-1"
+# Programmatic access key
+resource "aws_iam_access_key" "dev_user_key" {
+  user = aws_iam_user.dev_user.name
 }
 
-# ---------------------------
-# Create IAM User
-# ---------------------------
-resource "aws_iam_user" "example_user" {
-  name = "example-user"
+# Attach multiple user policies
+resource "aws_iam_user_policy_attachment" "user_policies" {
+  for_each   = toset(var.user_managed_policies)
+  user       = aws_iam_user.dev_user.name
+  policy_arn = each.value
 }
 
-# simple managed policy (optional)
-resource "aws_iam_user_policy_attachment" "readonly" {
-  user       = aws_iam_user.example_user.name
-  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
-}
-
-# ---------------------------
-# Create IAM Role
-# ---------------------------
+# ============================================================
+# IAM Role + Trust Relationship
+# ============================================================
 data "aws_iam_policy_document" "assume_role" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_user.example_user.arn]
+      identifiers = [aws_iam_user.dev_user.arn]
     }
-    actions = ["sts:AssumeRole"]
   }
 }
 
-resource "aws_iam_role" "example_role" {
-  name               = "example-role"
+resource "aws_iam_role" "project_role" {
+  name               = var.role_name
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-# Attach a policy to the role (optional)
-resource "aws_iam_role_policy_attachment" "s3_full_access" {
-  role       = aws_iam_role.example_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
-}
-
-# ---------------------------
-# Outputs
-# ---------------------------
-output "user_arn" {
-  value = aws_iam_user.example_user.arn
-}
-
-output "role_arn" {
-  value = aws_iam_role.example_role.arn
+# Attach policies to role
+resource "aws_iam_role_policy_attachment" "role_policies" {
+  for_each   = toset(var.role_managed_policies)
+  role       = aws_iam_role.project_role.name
+  policy_arn = each.value
 }
