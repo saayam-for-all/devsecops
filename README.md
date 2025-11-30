@@ -1,2 +1,2 @@
 # devops
-DevOps repo for all DevOp related work
+DevOps repo for all DevOp related work.
