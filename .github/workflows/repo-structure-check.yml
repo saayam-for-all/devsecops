@@ -15,7 +15,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          missing=false
+          missing_files=()
 
           required_files=(
             "README.md"
@@ -23,25 +23,28 @@ jobs:
             ".gitignore"
           )
 
-          echo "Checking required files in ${{ github.repository }}"
+          echo "Checking required files in PR branch: ${{ github.head_ref }}"
 
           for file in "${required_files[@]}"; do
             echo "Checking $file..."
 
             status=$(curl -s -o /dev/null -w "%{http_code}" \
               -H "Authorization: token $GH_TOKEN" \
-              https://api.github.com/repos/${{ github.repository }}/contents/$file)
+              "https://api.github.com/repos/${{ github.repository }}/contents/$file?ref=${{ github.head_ref }}")
 
             if [ "$status" != "200" ]; then
               echo "Missing: $file"
-              missing=true
+              missing_files+=("$file")
             else
               echo "Found $file"
             fi
           done
 
-          if [ "$missing" = true ]; then
-            echo "One or more required files are missing."
+          if [ ${#missing_files[@]} -gt 0 ]; then
+            echo "Missing files:"
+            for f in "${missing_files[@]}"; do
+              echo " - $f"
+            done
             exit 1
           fi
 
