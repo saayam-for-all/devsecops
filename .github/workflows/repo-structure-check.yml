@@ -2,35 +2,46 @@ name: Repo Structure Check
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   verify-files:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Check required files exist
+      - name: Check required files via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           missing=false
 
-          for file in README.md CONTRIBUTING.md .gitignore; do
-            if [ ! -f "$file" ]; then
-              echo "Missing required file: $file"
+          required_files=(
+            "README.md"
+            "CONTRIBUTING.md"
+            ".gitignore"
+          )
+
+          echo "Checking required files in ${{ github.repository }}"
+
+          for file in "${required_files[@]}"; do
+            echo "Checking $file..."
+
+            status=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "Authorization: token $GH_TOKEN" \
+              https://api.github.com/repos/${{ github.repository }}/contents/$file)
+
+            if [ "$status" != "200" ]; then
+              echo "Missing: $file"
               missing=true
             else
-              echo "✔️ Found $file"
+              echo "Found $file"
             fi
           done
 
           if [ "$missing" = true ]; then
-            echo "One or more required files are missing. Please restore them."
+            echo "One or more required files are missing."
             exit 1
           fi
 
