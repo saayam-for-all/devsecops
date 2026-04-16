@@ -1,8 +1,0 @@
-name: Local Checkout Wrapper
-description: Wrapper for actions/checkout to bypass org restrictions
-
-runs:
-  using: composite
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
