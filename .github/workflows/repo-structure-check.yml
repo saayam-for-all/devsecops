@@ -1,0 +1,43 @@
+name: Repository Structure Check
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verify-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for critical repository files
+        run: |
+          # Standard requirements from maintainer
+          CORE_FILES=("README.md" "CONTRIBUTING.md" ".gitignore")
+
+          # Architectural requirements (based on the Saayam project doc)
+          # These ensure the CI/CD and infrastructure configurations aren't deleted.
+          INFRA_FILES=(".github/workflows" "Dockerfile" "package.json")
+
+          ALL_REQUIRED=("${CORE_FILES[@]}" "${INFRA_FILES[@]}")
+          MISSING=0
+
+          for file in "${ALL_REQUIRED[@]}"; do
+            if [ ! -e "$file" ]; then
+              echo "❌ Error: Critical component '$file' is missing!"
+              MISSING=$((MISSING + 1))
+            else
+              echo "✅ Found: $file"
+            fi
+          done
+
+          if [ $MISSING -gt 0 ]; then
+            echo "Total critical files missing: $MISSING"
+            exit 1
+          fi
+        shell: bash
