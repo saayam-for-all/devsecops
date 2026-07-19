@@ -12,11 +12,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Get SonarQube secrets from AWS Secrets Manager
+        id: secrets
+        run: |
+          sudo apt update && sudo apt install -y jq awscli
+          SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id sonarqube/credentials --query SecretString --output text)
+          echo "SONAR_TOKEN=$(echo $SECRET_JSON | jq -r .SONAR_TOKEN)" >> $GITHUB_ENV
+          echo "SONAR_HOST_URL=$(echo $SECRET_JSON | jq -r .SONAR_HOST_URL)" >> $GITHUB_ENV
+
       - name: SonarQube scan
         uses: sonarsource/sonarqube-scan-action@master
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
 
       - name: Copy files to local app directory
         run: |
@@ -27,4 +42,3 @@ jobs:
         run: |
           chmod +x ~/app/start.sh
           ~/app/start.sh
-
