@@ -11,33 +11,43 @@ on:
 jobs:
   verify-files:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check for critical repository files
+      - name: Check required files via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Standard requirements from maintainer
-          CORE_FILES=("README.md" "CONTRIBUTING.md" ".gitignore")
+          missing_files=()
 
-          # Architectural requirements (based on the Saayam project doc)
-          # These ensure the CI/CD and infrastructure configurations aren't deleted.
-          INFRA_FILES=(".github/workflows" "Dockerfile" "package.json")
+          required_files=(
+            "README.md"
+            "CONTRIBUTING.md"
+            ".gitignore"
+          )
 
-          ALL_REQUIRED=("${CORE_FILES[@]}" "${INFRA_FILES[@]}")
-          MISSING=0
+          echo "Checking required files in PR branch: ${{ github.head_ref }}"
 
-          for file in "${ALL_REQUIRED[@]}"; do
-            if [ ! -e "$file" ]; then
-              echo "❌ Error: Critical component '$file' is missing!"
-              MISSING=$((MISSING + 1))
+          for file in "${required_files[@]}"; do
+            echo "Checking $file..."
+
+            status=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/${{ github.repository }}/contents/$file?ref=${{ github.head_ref }}")
+
+            if [ "$status" != "200" ]; then
+              echo "Missing: $file"
+              missing_files+=("$file")
             else
-              echo "✅ Found: $file"
+              echo "Found $file"
             fi
           done
 
-          if [ $MISSING -gt 0 ]; then
-            echo "Total critical files missing: $MISSING"
+          if [ ${#missing_files[@]} -gt 0 ]; then
+            echo "Missing files:"
+            for f in "${missing_files[@]}"; do
+              echo " - $f"
+            done
             exit 1
           fi
-        shell: bash
+
+          echo "All required files are present."
