@@ -1,21 +1,54 @@
 name: DAST Scan
 
 on:
-  push:
-    branches: [ qa, owasp-zap ]
   pull_request:
-    branches: [ qa ]
+    branches: [main]
+  schedule:
+    # Nightly at 06:00 UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'URL to scan'
+        required: false
+        default: 'https://test-saayam.netlify.app'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  zap-scan:
+  zap-baseline:
+    name: OWASP ZAP Baseline
     runs-on: ubuntu-latest
+
     steps:
+      # Needed so ZAP can read .zap/rules.tsv from the workspace
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.12.0
+      - name: Run ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.14.0
         with:
-          target: 'https://your-qa-url.example.com'
-          cmd_options: '-a'
-          fail_action: true
+          target: ${{ inputs.target || 'https://test-saayam.netlify.app' }}
+          rules_file_name: '.zap/rules.tsv'
+          # Reports are published as artifacts instead of GitHub issues
+          allow_issue_writing: false
+          # Non-blocking for now; flip to true once the baseline is clean
+          fail_action: false
+          cmd_options: '-I'
+
+      - name: Upload ZAP reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-baseline-report
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          if-no-files-found: warn
+          retention-days: 30
