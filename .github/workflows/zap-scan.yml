@@ -35,20 +35,10 @@ jobs:
         with:
           target: ${{ inputs.target || 'https://test-saayam.netlify.app' }}
           rules_file_name: '.zap/rules.tsv'
-          # Reports are published as artifacts instead of GitHub issues
+          # The action uploads report_html/md/json itself under this name
+          artifact_name: 'zap-baseline-report'
+          # Publish reports as an artifact rather than filing a GitHub issue
           allow_issue_writing: false
           # Non-blocking for now; flip to true once the baseline is clean
           fail_action: false
           cmd_options: '-I'
-
-      - name: Upload ZAP reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-baseline-report
-          path: |
-            report_html.html
-            report_md.md
-            report_json.json
-          if-no-files-found: warn
-          retention-days: 30
