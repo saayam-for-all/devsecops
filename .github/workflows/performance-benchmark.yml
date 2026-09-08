@@ -1,0 +1,44 @@
+name: Performance Benchmark
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+
+jobs:
+  performance-test:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_branch == 'sonarqube-test'
+      )
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout deployed code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run k6 performance benchmark
+        env:
+          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+        run: |
+          mkdir -p performance-results
+          k6 run \
+            --out json=performance-results/raw-results.json \
+            tests/k6/api-benchmark.js
+
+      - name: Upload performance benchmark results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-performance-results-${{ github.run_number }}
+          path: performance-results/
+          retention-days: 30
