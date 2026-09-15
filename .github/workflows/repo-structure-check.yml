@@ -1,0 +1,60 @@
+name: Repo Structure Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check required files via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          missing_files=()
+
+          required_files=(
+            "README.md"
+            "CONTRIBUTING.md"
+            ".gitignore"
+          )
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            repo="${{ github.event.pull_request.head.repo.full_name }}"
+            ref="${{ github.event.pull_request.head.ref }}"
+          else
+            repo="${{ github.repository }}"
+            ref="${{ github.ref_name }}"
+          fi
+
+          echo "Checking required files in repository: $repo"
+          echo "Checking required files in branch: $ref"
+
+          for file in "${required_files[@]}"; do
+            echo "Checking $file..."
+
+            status=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/$repo/contents/$file?ref=$ref")
+
+            if [ "$status" != "200" ]; then
+              echo "Missing: $file"
+              missing_files+=("$file")
+            else
+              echo "Found $file"
+            fi
+          done
+
+          if [ ${#missing_files[@]} -gt 0 ]; then
+            echo "Missing files:"
+            for f in "${missing_files[@]}"; do
+              echo " - $f"
+            done
+            exit 1
+          fi
+
+          echo "All required files are present."
