@@ -95,8 +95,34 @@ flowchart LR
 | Auth Provider      | User authentication & JWT token issuance       | Cognito / Custom Service |
 
 ---
+## 7. Operational Communication & Email Alias Handoff
 
-## 7. UI Flow: Login → Dashboard
+### Purpose
+
+Organizational email aliases support structured communication for operational processes and stakeholder coordination. The configuration and management of these aliases are performed outside this repository using the organization's approved administrative systems.
+
+This repository documents the architecture and operational handoff process but does not configure or manage email aliases directly.
+
+### Operational Handoff
+
+When organizational email aliases are created, updated, or modified in the external administration system, the corresponding architecture documentation should be reviewed and updated to support future maintainers.
+
+### Validation Checklist
+
+Before completing an operational handoff:
+
+- Verify that organizational email aliases have been configured in the external administration system.
+- Confirm that communication routing has been validated by the appropriate administrators.
+- Update repository documentation if operational responsibilities or processes change.
+- Ensure future maintainers understand which tasks are managed within the repository and which require external administrative access.
+
+This documentation supports the process handoff described in Issue #78 while recognizing that alias configuration is managed outside this repository.
+
+> **Note:** Email alias configuration is performed outside this repository and is not managed through the codebase.
+
+---
+
+## 8. UI Flow: Login → Dashboard
 
 ```mermaid
 flowchart LR
@@ -112,7 +138,7 @@ flowchart LR
 
 ---
 
-## 8. Deployment Flow
+## 9. Deployment Flow
 
 ```mermaid
 flowchart TD
