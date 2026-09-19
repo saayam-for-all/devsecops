@@ -26,14 +26,25 @@ jobs:
       - name: Setup k6
         uses: grafana/setup-k6-action@v1
 
-      - name: Run k6 performance benchmark
-        env:
-          STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
-        run: |
-          mkdir -p performance-results
-          k6 run \
-            --out json=performance-results/raw-results.json \
-            tests/k6/api-benchmark.js
+     - name: Run k6 performance benchmark
+  env:
+    STAGING_BASE_URL: ${{ vars.STAGING_BASE_URL }}
+
+    # Configurable k6 load settings.
+    # Repository variables can override these defaults when needed.
+    K6_RAMP_UP_DURATION: ${{ vars.K6_RAMP_UP_DURATION || '10s' }}
+    K6_RAMP_UP_TARGET: ${{ vars.K6_RAMP_UP_TARGET || '5' }}
+    K6_STEADY_DURATION: ${{ vars.K6_STEADY_DURATION || '30s' }}
+    K6_STEADY_TARGET: ${{ vars.K6_STEADY_TARGET || '10' }}
+    K6_RAMP_DOWN_DURATION: ${{ vars.K6_RAMP_DOWN_DURATION || '10s' }}
+    K6_RAMP_DOWN_TARGET: ${{ vars.K6_RAMP_DOWN_TARGET || '0' }}
+
+  run: |
+    mkdir -p performance-results
+
+    k6 run \
+      --out json=performance-results/raw-results.json \
+      tests/k6/api-benchmark.js
 
       - name: Upload performance benchmark results
         if: always()
