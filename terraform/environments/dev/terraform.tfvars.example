@@ -1,0 +1,20 @@
+# Example terraform.tfvars for Development Environment IAM Provisioning
+aws_region                   = "us-east-1"
+environment                  = "dev"
+volunteer_developer_username = "volunteer-dev"
+volunteer_developer_email    = "volunteer-dev@saayam.org"
+
+volunteer_s3_bucket_arns = [
+  "arn:aws:s3:::saayam-dev-volunteer-media",
+  "arn:aws:s3:::saayam-virginia-private"
+]
+
+additional_developers = {
+  "request-dev-1" = {
+    project_name   = "request"
+    email          = "request-dev@saayam.org"
+    role_purpose   = "s3-attachments"
+    team           = "Request-Service"
+    s3_bucket_arns = ["arn:aws:s3:::saayam-dev-request-attachments"]
+  }
+}
