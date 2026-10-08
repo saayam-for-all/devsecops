@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: ./.github/actions/checkout
 
       - name: Install k6
         run: |
@@ -30,4 +30,4 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
         run: |
-          k6 run benchmarking.js
+          k6 run tests/k6/benchmarking.js
