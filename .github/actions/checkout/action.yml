@@ -4,6 +4,11 @@ description: Checkout repository without external actions
 runs:
   using: composite
   steps:
+    - name: Authenticate GitHub
+      shell: bash
+      run: |
+        git config --global url."https://x-access-token:${GITHUB_TOKEN}@github.com/".insteadOf "https://github.com/"
+
     - name: Initialize repo
       shell: bash
       run: |
