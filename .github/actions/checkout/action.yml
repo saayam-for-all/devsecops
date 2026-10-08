@@ -1,0 +1,13 @@
+name: Local Checkout
+description: Checkout repository without external actions
+
+runs:
+  using: composite
+  steps:
+    - name: Initialize repo
+      shell: bash
+      run: |
+        git init
+        git remote add origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY"
+        git fetch --depth=1 origin "$GITHUB_REF"
+        git checkout FETCH_HEAD
