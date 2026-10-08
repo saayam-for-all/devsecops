@@ -1,0 +1,49 @@
+name: k6 Benchmarking
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  k6-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download performance-benchmarking.js via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -H "Authorization: token $GH_TOKEN" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -o benchmarking.js \
+               https://api.github.com/repos/${{ github.repository }}/contents/tests/k6/performance-benchmarking.js?ref=${{ github.ref_name }}
+
+      - name: Download api.csv via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -H "Authorization: token $GH_TOKEN" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -o api.csv \
+               https://api.github.com/repos/${{ github.repository }}/contents/tests/k6/api.csv?ref=${{ github.ref_name }}
+
+      - name: Install k6
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg ca-certificates
+          curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
+          echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install -y k6
+
+      - name: Run k6 Benchmark (do not fail workflow)
+        continue-on-error: true
+        env:
+          AUTH_URL: ${{ secrets.AUTH_URL }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          k6 run benchmarking.js || true
