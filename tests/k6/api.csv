@@ -1,0 +1,2 @@
+api_name,method,url,user_id,address
+updateLocation,POST,https://vzoydlfqvj.execute-api.us-east-1.amazonaws.com/dev/updateVolunteerLocation,SID-00-000-001-596,"Eiffel Tower, Paris"
