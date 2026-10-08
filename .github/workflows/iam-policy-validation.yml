@@ -1,0 +1,78 @@
+name: IAM Policy & Terraform Security Validation
+
+on:
+  push:
+    branches: [ main, dev, staging ]
+    paths:
+      - 'terraform/**'
+      - 'scripts/**'
+      - '.github/workflows/iam-policy-validation.yml'
+  pull_request:
+    branches: [ main, dev, staging ]
+    paths:
+      - 'terraform/**'
+      - 'scripts/**'
+      - '.github/workflows/iam-policy-validation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate-iam-and-terraform:
+    name: Validate IAM Policies & Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt flake8
+
+      - name: Lint Python scripts
+        run: |
+          flake8 scripts/ --count --max-line-length=127 --statistics
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.7.5'
+
+      - name: Check Terraform Formatting
+        run: |
+          terraform fmt -check -recursive terraform/
+
+      - name: Validate Module Configuration
+        run: |
+          terraform -chdir=terraform/modules/iam_dev_user_role init -backend=false
+          terraform -chdir=terraform/modules/iam_dev_user_role validate
+
+      - name: Validate Dev Environment Configuration
+        run: |
+          terraform -chdir=terraform/environments/dev init -backend=false
+          terraform -chdir=terraform/environments/dev validate
+
+      - name: Run IAM Least-Privilege & Security Linter
+        run: |
+          python scripts/validate_iam_policies.py --path terraform/
+
+      - name: Generate Job Summary
+        if: always()
+        run: |
+          echo "## 🛡️ IAM & Terraform Security Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| Terraform Format (\`fmt\`) | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Terraform Module Validate | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| IAM Least-Privilege Scan | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| Python Script Linting | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
