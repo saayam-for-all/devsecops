@@ -80,7 +80,7 @@ export default function () {
       ["POST", "PUT", "PATCH"].includes(api.method.toUpperCase())
     ) {
       if (api.payload && api.payload.trim() !== "") {
-        payload = api.payload;
+          payload = api.payload.replace(/""/g, '"');
       }
     }
 
