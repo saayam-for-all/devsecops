@@ -1,0 +1,30 @@
+# Configuration for Ireland Deployment (eu-west-1)
+aws_region     = "eu-west-1"
+environment    = "dev"
+target_regions = ["us-east-1", "eu-west-1"]
+
+# ElastiCache Shared Configuration
+enable_shared_elasticache  = true
+elasticache_engine         = "valkey"          # Lowest cost engine
+elasticache_engine_version = "7.2"
+elasticache_node_type      = "cache.t4g.micro" # Lowest cost instance
+elasticache_num_nodes      = 1
+
+# Systems Manager Parameter Store (Team Hierarchy)
+enable_ssm_parameter_store = true
+ssm_parameters = {
+  "db_host" = {
+    team        = "volunteer"
+    service     = "profile-service"
+    type        = "String"
+    value       = "aurora-ireland-dev.saayam.internal"
+    description = "Ireland Aurora DB host for volunteer service"
+  }
+  "db_password" = {
+    team        = "volunteer"
+    service     = "profile-service"
+    type        = "SecureString"
+    value       = "DevSecretPassword123!"
+    description = "Ireland database password for volunteer service"
+  }
+}
