@@ -12,19 +12,11 @@ export const options = {
   },
 };
 
-// =====================
-// LOAD CSV
-// =====================
-
 const apiData = new SharedArray('apiData', function () {
-
   const parsed = Papa.parse(open('./api.csv'), {
     header: true,
     skipEmptyLines: true,
   }).data;
-
-  console.log('CSV CONTENTS:');
-  console.log(JSON.stringify(parsed));
 
   parsed.forEach((row, index) => {
     if (!row.api_name || !row.method || !row.url) {
@@ -37,10 +29,6 @@ const apiData = new SharedArray('apiData', function () {
   return parsed;
 });
 
-// =====================
-// METRICS
-// =====================
-
 const apiMetrics = {};
 
 apiData.forEach(api => {
@@ -51,21 +39,12 @@ apiData.forEach(api => {
   };
 });
 
-// =====================
-// AUTH CONFIG
-// =====================
-
 const AUTH_URL = __ENV.AUTH_URL;
 const CLIENT_ID = __ENV.CLIENT_ID;
 const USERNAME = __ENV.USERNAME;
 const PASSWORD = __ENV.PASSWORD;
 
-// =====================
-// GET TOKEN
-// =====================
-
 function getToken() {
-
   const authPayload = JSON.stringify({
     AuthFlow: 'USER_PASSWORD_AUTH',
     ClientId: CLIENT_ID,
@@ -87,50 +66,30 @@ function getToken() {
     { headers: authHeaders }
   );
 
-  console.log(`AUTH STATUS: ${authRes.status}`);
-  console.log(`AUTH RESPONSE: ${authRes.body}`);
-
   check(authRes, {
     'auth success': r => r.status === 200
   });
 
-  const token =
-    authRes.json('AuthenticationResult.IdToken');
-
-  console.log(`TOKEN FOUND: ${!!token}`);
-
-  return token;
-}
-
-// =====================
-// MAIN TEST
-// =====================
-
-export default function () {
-
-  const token = getToken();
-
-  if (!token) {
-
-    console.error(
-      'No token returned from Cognito. Skipping iteration.'
-    );
-
-    return;
+  if (authRes.status !== 200) {
+    throw new Error('Failed to obtain Cognito token');
   }
 
-  for (const api of apiData) {
+  return authRes.json(
+    'AuthenticationResult.IdToken'
+  );
+}
 
-    if (
-      !api.url ||
-      api.url.trim() === '' ||
-      api.url === '#<nil>'
-    ) {
-      console.error(
-        `Skipping ${api.api_name} due to invalid URL`
-      );
-      continue;
-    }
+export function setup() {
+  return {
+    token: getToken()
+  };
+}
+
+export default function (data) {
+
+  const token = data.token;
+
+  for (const api of apiData) {
 
     const headers = {
       'Content-Type': 'application/json',
@@ -152,8 +111,6 @@ export default function () {
         payload = api.payload
           .replace(/""/g, '"');
 
-        // remove wrapping quotes
-
         if (
           payload.startsWith('"') &&
           payload.endsWith('"')
@@ -163,22 +120,12 @@ export default function () {
       }
     }
 
-    console.log('===============================');
-    console.log(`API NAME: ${api.api_name}`);
-    console.log(`METHOD: ${api.method}`);
-    console.log(`URL: ${api.url}`);
-    console.log(`PAYLOAD: ${payload}`);
-    console.log('===============================');
-
     const res = http.request(
       api.method,
       api.url.trim(),
       payload,
       { headers }
     );
-
-    console.log(`STATUS: ${res.status}`);
-    console.log(`RESPONSE BODY: ${res.body}`);
 
     apiMetrics[api.api_name]
       .latency
