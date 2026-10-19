@@ -20,7 +20,9 @@ const apiData = new SharedArray("apiData", function () {
 
   parsed.forEach((row, index) => {
     if (!row.api_name || !row.method || !row.url) {
-      throw new Error(`CSV row ${index + 1} is missing required fields`);
+      throw new Error(
+        `CSV row ${index + 1} is missing api_name, method, or url`
+      );
     }
   });
 
@@ -74,16 +76,12 @@ export default function () {
 
     let payload = null;
 
-    if (api.method === "POST" || api.method === "PUT") {
-      payload = {};
-
-      Object.keys(api).forEach(key => {
-        if (!["api_name", "method", "url"].includes(key) && api[key] !== "") {
-          payload[key] = api[key];
-        }
-      });
-
-      payload = JSON.stringify(payload);
+    if (
+      ["POST", "PUT", "PATCH"].includes(api.method.toUpperCase())
+    ) {
+      if (api.payload && api.payload.trim() !== "") {
+        payload = api.payload;
+      }
     }
 
     const res = http.request(api.method, api.url, payload, { headers });
