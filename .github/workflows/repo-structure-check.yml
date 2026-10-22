@@ -1,0 +1,48 @@
+name: Repo Structure Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-files:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify required files
+        run: |
+          missing_files=()
+
+          required_files=(
+            "README.md"
+            "CONTRIBUTING.md"
+            ".gitignore"
+          )
+
+          echo "Checking required files in checked-out repository..."
+
+          for file in "${required_files[@]}"; do
+            echo "Checking $file..."
+
+            if [ ! -f "$file" ]; then
+              echo "Missing: $file"
+              missing_files+=("$file")
+            else
+              echo "Found $file"
+            fi
+          done
+
+          if [ ${#missing_files[@]} -gt 0 ]; then
+            echo "Missing files:"
+            for f in "${missing_files[@]}"; do
+              echo " - $f"
+            done
+            exit 1
+          fi
+
+          echo "All required files are present."
