@@ -1,0 +1,59 @@
+# --------------------------------------------------------------------------------------------------
+# Multi-Region Environment tfvars Example: Virginia (us-east-1) & Ireland (eu-west-1)
+# --------------------------------------------------------------------------------------------------
+
+environment = "multi-region"
+
+# ElastiCache Engine Config (Valkey is 33% cheaper than Redis)
+elasticache_engine         = "valkey"
+elasticache_engine_version = "7.2"
+elasticache_node_type      = "cache.t4g.micro"
+
+# Networking (Leave blank to use default VPC/Subnets)
+virginia_vpc_id      = ""
+virginia_subnet_ids  = []
+ireland_vpc_id       = ""
+ireland_subnet_ids   = []
+
+# Common SSM Parameters across regions
+common_parameters = {
+  "volunteer_db_host" = {
+    team        = "volunteer"
+    service     = "profile-service"
+    type        = "String"
+    value       = "aurora.saayam.internal"
+    description = "Volunteer profile service database endpoint"
+  }
+  "request_api_key" = {
+    team        = "request"
+    service     = "matching-service"
+    type        = "SecureString"
+    value       = "ProductionSecretApiKey123!"
+    description = "Request matching service API token"
+  }
+}
+
+# Regional Hardened Private S3 Buckets (Issue #65)
+enable_regional_private_s3_buckets = true
+bucket_prefix                      = "" # Leave empty for exact bucket names (e.g. dev-private-virginia)
+s3_sse_algorithm                   = "AES256"
+
+# Cognito User Pools: DevUserPool & QAUserPool (Issue #65)
+enable_cognito_user_pools  = true
+qa_advanced_security_mode  = "ENFORCED" # ENFORCED or AUDIT
+
+qa_callback_urls = [
+  "https://QA_saayam-netlify.app/callback",
+  "https://QA_saayam-netlify.app",
+  "http://localhost:3000/callback"
+]
+
+qa_logout_urls = [
+  "https://QA_saayam-netlify.app/logout",
+  "http://localhost:3000/logout"
+]
+
+qa_lambda_trigger_names = [
+  "saayam-qa-cognito-pre-sign-up",
+  "saayam-qa-cognito-post-confirmation"
+]

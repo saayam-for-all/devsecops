@@ -1,0 +1,75 @@
+# Example terraform.tfvars for Development Environment (Shared Infrastructure)
+aws_region  = "us-east-1"
+environment = "dev"
+
+# Target regions for cross-region IAM policies (Virginia + Ireland)
+target_regions = ["us-east-1", "eu-west-1"]
+
+# ElastiCache Shared Configuration (Lowest-cost option)
+enable_shared_elasticache  = true
+elasticache_engine         = "valkey"          # Lowest cost engine (~33% cheaper than redis)
+elasticache_engine_version = "7.2"
+elasticache_node_type      = "cache.t4g.micro" # Lowest cost Graviton2 instance
+elasticache_num_nodes      = 1
+
+# Optional: Specify explicit VPC and subnets (otherwise defaults are queried)
+# vpc_id     = "vpc-0123456789abcdef0"
+# subnet_ids = ["subnet-0123456789abcdef0", "subnet-0fedcba9876543210"]
+
+# SSM Parameter Store: Team-level hierarchical parameters (/{team}/{service}/{key})
+enable_ssm_parameter_store = true
+ssm_parameters = {
+  "db_host" = {
+    team        = "volunteer"
+    service     = "profile-service"
+    type        = "String"
+    value       = "aurora-dev.saayam.internal"
+    description = "Database host for volunteer profile service"
+  }
+  "db_password" = {
+    team        = "volunteer"
+    service     = "profile-service"
+    type        = "SecureString"
+    value       = "DevSecretPassword123!"
+    description = "Database password for volunteer profile service"
+  }
+  "matching_api_url" = {
+    team        = "request"
+    service     = "matching-service"
+    type        = "String"
+    value       = "https://api-dev.saayam.org/matching"
+    description = "Matching service API endpoint"
+  }
+  "api_key" = {
+    team        = "request"
+    service     = "matching-service"
+    type        = "SecureString"
+    value       = "DevRequestServiceApiKey123!"
+    description = "Secret API key for request matching service"
+  }
+}
+
+# Developer IAM User Provisioning (Issue #75)
+volunteer_developer_username = "volunteer-dev"
+volunteer_developer_email    = "volunteer-dev@saayam.org"
+volunteer_s3_bucket_arns = [
+  "arn:aws:s3:::saayam-dev-volunteer-media",
+  "arn:aws:s3:::saayam-virginia-private"
+]
+
+additional_developers = {
+  "request-dev-1" = {
+    project_name   = "request"
+    email          = "request-dev@saayam.org"
+    role_purpose   = "s3-attachments"
+    team           = "Request-Service"
+    s3_bucket_arns = ["arn:aws:s3:::saayam-dev-request-attachments"]
+  }
+}
+
+# Cognito & Private S3 Buckets (Issue #65)
+enable_cognito_user_pool  = true
+dev_user_pool_name        = "DevUserPool"
+enable_dev_private_bucket = true
+bucket_prefix             = ""
+
