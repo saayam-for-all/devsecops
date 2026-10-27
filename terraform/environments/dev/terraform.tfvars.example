@@ -66,3 +66,10 @@ additional_developers = {
     s3_bucket_arns = ["arn:aws:s3:::saayam-dev-request-attachments"]
   }
 }
+
+# Cognito & Private S3 Buckets (Issue #65)
+enable_cognito_user_pool  = true
+dev_user_pool_name        = "DevUserPool"
+enable_dev_private_bucket = true
+bucket_prefix             = ""
+

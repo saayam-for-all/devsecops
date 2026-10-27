@@ -94,3 +94,27 @@ output "additional_dev_users_summary" {
     }
   }
 }
+
+# --------------------------------------------------------------------------------------------------
+# Cognito & Storage Outputs (Issue #65)
+# --------------------------------------------------------------------------------------------------
+output "dev_user_pool_id" {
+  description = "Cognito User Pool ID for DevUserPool"
+  value       = try(module.dev_cognito_user_pool[0].user_pool_id, "")
+}
+
+output "dev_user_pool_arn" {
+  description = "Cognito User Pool ARN for DevUserPool"
+  value       = try(module.dev_cognito_user_pool[0].user_pool_arn, "")
+}
+
+output "dev_app_client_id" {
+  description = "Cognito App Client ID for DevUserPool"
+  value       = try(module.dev_cognito_user_pool[0].primary_client_id, "")
+}
+
+output "dev_private_bucket_arn" {
+  description = "ARN of the hardened regional dev private S3 bucket"
+  value       = try(module.dev_private_bucket[0].bucket_arn, "")
+}
+

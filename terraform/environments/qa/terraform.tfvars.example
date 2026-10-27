@@ -1,0 +1,36 @@
+# --------------------------------------------------------------------------------------------------
+# Example tfvars: QA Environment
+# --------------------------------------------------------------------------------------------------
+
+aws_region  = "us-east-1"
+environment = "qa"
+
+# QA Cognito User Pool
+user_pool_name         = "QAUserPool"
+advanced_security_mode = "ENFORCED" # ENFORCED or AUDIT
+mfa_configuration      = "OPTIONAL"
+
+# Netlify App Client
+app_client_name = "saayam-qa-webapp-client"
+callback_urls = [
+  "https://QA_saayam-netlify.app/callback",
+  "https://QA_saayam-netlify.app",
+  "http://localhost:3000/callback"
+]
+logout_urls = [
+  "https://QA_saayam-netlify.app/logout",
+  "http://localhost:3000/logout"
+]
+
+lambda_trigger_names = [
+  "saayam-qa-cognito-pre-sign-up",
+  "saayam-qa-cognito-post-confirmation"
+]
+
+# Regional S3 Buckets
+enable_private_s3_buckets = true
+bucket_prefix             = "" # Set prefix if needed for globally unique S3 name (e.g. "saayam")
+sse_algorithm             = "AES256"
+
+# Netlify SSM Parameters
+enable_ssm_parameter_store = true

@@ -8,6 +8,7 @@
 # --------------------------------------------------------------------------------------------------
 
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 
 # VPC and Subnet lookup fallback if not explicitly provided
 data "aws_vpc" "default" {
@@ -208,5 +209,59 @@ module "additional_dev_users" {
 
   tags = {
     Team = lookup(each.value, "team", "DevSecOps")
+  }
+}
+
+# --------------------------------------------------------------------------------------------------
+# 5. Dev Cognito User Pool (Baseline DevUserPool for Issue #65)
+# --------------------------------------------------------------------------------------------------
+module "dev_cognito_user_pool" {
+  count  = var.enable_cognito_user_pool ? 1 : 0
+  source = "../../modules/cognito_user_pool"
+
+  environment            = var.environment
+  user_pool_name         = var.dev_user_pool_name
+  advanced_security_mode = "OFF"
+  mfa_configuration      = "OPTIONAL"
+
+  client_name = "saayam-dev-webapp-client"
+  client_callback_urls = [
+    "http://localhost:3000/callback",
+    "https://dev.saayam.org/callback"
+  ]
+  client_logout_urls = [
+    "http://localhost:3000/logout",
+    "https://dev.saayam.org/logout"
+  ]
+
+  enable_cloudtrail_logging = false
+
+  tags = {
+    Environment = var.environment
+    Pool        = var.dev_user_pool_name
+  }
+}
+
+# --------------------------------------------------------------------------------------------------
+# 6. Hardened Dev Regional Private S3 Bucket (Zero-Privilege)
+# --------------------------------------------------------------------------------------------------
+locals {
+  dev_bucket_prefix = var.bucket_prefix != "" ? "${var.bucket_prefix}-" : ""
+}
+
+module "dev_private_bucket" {
+  count  = var.enable_dev_private_bucket ? 1 : 0
+  source = "../../modules/s3_private_bucket"
+
+  bucket_name = "${local.dev_bucket_prefix}dev-private-${data.aws_region.current.name == "us-east-1" ? "virginia" : "ireland"}"
+  environment = var.environment
+
+  enable_versioning      = true
+  enable_lifecycle_rules = true
+
+  tags = {
+    Environment = var.environment
+    Region      = data.aws_region.current.name
+    Scope       = "Dev-Private-Storage"
   }
 }

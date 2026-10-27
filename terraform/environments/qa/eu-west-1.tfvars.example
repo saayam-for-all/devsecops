@@ -1,0 +1,7 @@
+aws_region  = "eu-west-1"
+environment = "qa"
+
+user_pool_name         = "QAUserPool"
+advanced_security_mode = "ENFORCED"
+app_client_name        = "saayam-qa-webapp-client"
+enable_private_s3_buckets = true

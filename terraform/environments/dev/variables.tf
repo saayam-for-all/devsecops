@@ -160,3 +160,31 @@ variable "additional_developers" {
   description = "Map of additional developers to provision modularly"
   default     = {}
 }
+
+# --------------------------------------------------------------------------------------------------
+# Cognito User Pool & Private S3 Hardening (Issue #65)
+# --------------------------------------------------------------------------------------------------
+variable "enable_cognito_user_pool" {
+  type        = bool
+  description = "Whether to provision the DevUserPool in the dev environment"
+  default     = true
+}
+
+variable "dev_user_pool_name" {
+  type        = string
+  description = "Name of the Dev Cognito User Pool"
+  default     = "DevUserPool"
+}
+
+variable "enable_dev_private_bucket" {
+  type        = bool
+  description = "Whether to provision the regional dev-private S3 bucket"
+  default     = true
+}
+
+variable "bucket_prefix" {
+  type        = string
+  description = "Prefix for private S3 buckets (default empty for literal name)"
+  default     = ""
+}
+

@@ -5,7 +5,7 @@
 variable "environment" {
   type        = string
   description = "Environment identifier"
-  default     = "dev"
+  default     = "multi-region"
 }
 
 # Virginia Networking
@@ -79,4 +79,68 @@ variable "common_parameters" {
       description = "Request API Key"
     }
   }
+}
+
+# --------------------------------------------------------------------------------------------------
+# Regional Private S3 Buckets (Issue #65)
+# --------------------------------------------------------------------------------------------------
+variable "enable_regional_private_s3_buckets" {
+  type        = bool
+  description = "Whether to provision the 8 regional private S3 buckets across Virginia and Ireland"
+  default     = true
+}
+
+variable "bucket_prefix" {
+  type        = string
+  description = "Prefix for private S3 buckets (default empty for literal bucket names)"
+  default     = ""
+}
+
+variable "s3_sse_algorithm" {
+  type        = string
+  description = "S3 server-side encryption algorithm: AES256 or aws:kms"
+  default     = "AES256"
+}
+
+# --------------------------------------------------------------------------------------------------
+# Cognito User Pools: DevUserPool & QAUserPool (Issue #65)
+# --------------------------------------------------------------------------------------------------
+variable "enable_cognito_user_pools" {
+  type        = bool
+  description = "Whether to provision DevUserPool and QAUserPool"
+  default     = true
+}
+
+variable "qa_advanced_security_mode" {
+  type        = string
+  description = "Cognito Advanced Security Features mode for QAUserPool (ENFORCED or AUDIT)"
+  default     = "ENFORCED"
+}
+
+variable "qa_callback_urls" {
+  type        = list(string)
+  description = "Allowed callback URLs for QA_saayam-netlify.app"
+  default = [
+    "https://QA_saayam-netlify.app/callback",
+    "https://QA_saayam-netlify.app",
+    "http://localhost:3000/callback"
+  ]
+}
+
+variable "qa_logout_urls" {
+  type        = list(string)
+  description = "Allowed logout URLs for QA_saayam-netlify.app"
+  default = [
+    "https://QA_saayam-netlify.app/logout",
+    "http://localhost:3000/logout"
+  ]
+}
+
+variable "qa_lambda_trigger_names" {
+  type        = list(string)
+  description = "Cognito Lambda trigger function names to provision CloudWatch log streams for"
+  default = [
+    "saayam-qa-cognito-pre-sign-up",
+    "saayam-qa-cognito-post-confirmation"
+  ]
 }
