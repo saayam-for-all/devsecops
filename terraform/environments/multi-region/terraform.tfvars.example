@@ -1,0 +1,29 @@
+# Example Multi-Region terraform.tfvars
+environment = "dev"
+
+# Optional explicit VPC and Subnets
+# virginia_vpc_id     = "vpc-0va12345678"
+# virginia_subnet_ids = ["subnet-0va1", "subnet-0va2"]
+# ireland_vpc_id      = "vpc-0irl12345678"
+# ireland_subnet_ids  = ["subnet-0irl1", "subnet-0irl2"]
+
+elasticache_engine         = "valkey"
+elasticache_engine_version = "7.2"
+elasticache_node_type      = "cache.t4g.micro"
+
+common_parameters = {
+  "volunteer_db_host" = {
+    team        = "volunteer"
+    service     = "profile-service"
+    type        = "String"
+    value       = "aurora.saayam.internal"
+    description = "Database host"
+  }
+  "request_api_key" = {
+    team        = "request"
+    service     = "matching-service"
+    type        = "SecureString"
+    value       = "ChangeMeDevSecret123!"
+    description = "Request API Key"
+  }
+}
