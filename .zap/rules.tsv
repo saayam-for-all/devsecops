@@ -1,0 +1,20 @@
+# OWASP ZAP baseline scan rule configuration - Issue #46
+#
+# Format: <rule id>\t<WARN|IGNORE|FAIL>\t<comment>
+#
+# Only informational/low-value rules are suppressed here. The security header
+# and CSP rules are deliberately left active - those are the real findings
+# validated against the test environment (see issue #46, 2026-05-27).
+
+10015	IGNORE	Incomplete or no cache-control header - static CDN assets, not a finding
+10096	IGNORE	Timestamp disclosure - false positives on hashed asset filenames
+10109	IGNORE	Modern web application - informational only
+10049	IGNORE	Non-storable content - expected behaviour for a SPA
+
+# Deliberately NOT ignored - these are the findings we want reported:
+#   10020  Missing anti-clickjacking header
+#   10021  X-Content-Type-Options header missing
+#   10035  Strict-Transport-Security header
+#   10038  Content Security Policy header not set
+#   10063  Permissions policy header not set
+#   90004  Insufficient site isolation against spectre
