@@ -1,0 +1,57 @@
+name: Load Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      users:
+        description: "Number of users"
+        default: "10"
+      spawn_rate:
+        description: "Users spawned per second"
+        default: "2"
+      run_time:
+        description: "Run time (e.g. 30s, 1m, 5m)"
+        default: "1m"
+
+jobs:
+  locust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      HOST: https://api.help-for-everyone.org
+      USERS: ${{ inputs.users || '10' }}
+      SPAWN_RATE: ${{ inputs.spawn_rate || '2' }}
+      RUN_TIME: ${{ inputs.run_time || '1m' }}
+      AUTH_URL: ${{ secrets.AUTH_URL }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      USERNAME: ${{ secrets.USERNAME }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install locust requests
+
+      - name: Run Locust
+        run: |
+          locust -f locustfile.py \
+            --host="$HOST" \
+            --headless \
+            -u "$USERS" -r "$SPAWN_RATE" -t "$RUN_TIME" \
+            --csv=results \
+            --html=report.html
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: locust-results
+          path: |
+            results_*.csv
+            report.html
