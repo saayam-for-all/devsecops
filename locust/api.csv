@@ -1,0 +1,4 @@
+api_name,method,url,payload
+getAppEnv,GET,/v1/request/getAppEnv,
+helpRequests,POST,/v1/request/help-requests,"{}"
+updateLocation,POST,https://vzoydlfqvj.execute-api.us-east-1.amazonaws.com/dev/updateVolunteerLocation,"{""user_id"":""SID001"",""address"":""Paris""}"
