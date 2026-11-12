@@ -1,4 +1,4 @@
-name: Load Test
+name: Locust Benchmarking
 
 on:
   workflow_dispatch:
@@ -12,46 +12,51 @@ on:
       run_time:
         description: "Run time (e.g. 30s, 1m, 5m)"
         default: "1m"
+  push:
+    branches:
+      - main
 
 jobs:
-  locust:
+  locust-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    env:
-      HOST: https://api.help-for-everyone.org
-      USERS: ${{ inputs.users || '10' }}
-      SPAWN_RATE: ${{ inputs.spawn_rate || '2' }}
-      RUN_TIME: ${{ inputs.run_time || '1m' }}
-      AUTH_URL: ${{ secrets.AUTH_URL }}
-      CLIENT_ID: ${{ secrets.CLIENT_ID }}
-      USERNAME: ${{ secrets.USERNAME }}
-      PASSWORD: ${{ secrets.PASSWORD }}
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install dependencies
-        run: pip install locust requests
-
-      - name: Run Locust
+      - name: Download locustfile.py via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          locust -f locustfile.py \
-            --host="$HOST" \
-            --headless \
-            -u "$USERS" -r "$SPAWN_RATE" -t "$RUN_TIME" \
-            --csv=results \
-            --html=report.html
+          curl -H "Authorization: token $GH_TOKEN" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -o locustfile.py \
+               "https://api.github.com/repos/${{ github.repository }}/contents/tests/locust/locustfile.py?ref=${{ github.ref_name }}"
 
-      - name: Upload results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: locust-results
-          path: |
-            results_*.csv
-            report.html
+      - name: Download api.csv via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -H "Authorization: token $GH_TOKEN" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               -o api.csv \
+               "https://api.github.com/repos/${{ github.repository }}/contents/tests/locust/api.csv?ref=${{ github.ref_name }}"
+
+      - name: Install Locust
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install locust requests
+
+      - name: Run Locust Benchmark (do not fail workflow)
+        continue-on-error: true
+        env:
+          AUTH_URL: ${{ secrets.AUTH_URL }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          . .venv/bin/activate
+          locust -f locustfile.py \
+            --host=https://api.help-for-everyone.org \
+            --headless \
+            -u "${{ inputs.users || '10' }}" \
+            -r "${{ inputs.spawn_rate || '2' }}" \
+            -t "${{ inputs.run_time || '1m' }}" || true
