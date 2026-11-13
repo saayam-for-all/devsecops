@@ -25,19 +25,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -H "Authorization: token $GH_TOKEN" \
+          curl -fsS -H "Authorization: token $GH_TOKEN" \
                -H "Accept: application/vnd.github.v3.raw" \
                -o locustfile.py \
-               "https://api.github.com/repos/${{ github.repository }}/contents/tests/locust/locustfile.py?ref=${{ github.ref_name }}"
+               "https://api.github.com/repos/${{ github.repository }}/contents/locust/locust.file.py?ref=${{ github.ref_name }}"
 
       - name: Download api.csv via GitHub API
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl -H "Authorization: token $GH_TOKEN" \
+          curl -fsS -H "Authorization: token $GH_TOKEN" \
                -H "Accept: application/vnd.github.v3.raw" \
                -o api.csv \
-               "https://api.github.com/repos/${{ github.repository }}/contents/tests/locust/api.csv?ref=${{ github.ref_name }}"
+               "https://api.github.com/repos/${{ github.repository }}/contents/locust/api.csv?ref=${{ github.ref_name }}"
 
       - name: Install Locust
         run: |
