@@ -16,6 +16,13 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
+concurrency:
+  group: locust-load-test
+  cancel-in-progress: false
+
 jobs:
   locust-test:
     runs-on: ubuntu-latest
@@ -57,6 +64,46 @@ jobs:
           locust -f locustfile.py \
             --host=https://api.help-for-everyone.org \
             --headless \
+            --csv=results \
+            --html=report.html \
             -u "${{ inputs.users || '10' }}" \
             -r "${{ inputs.spawn_rate || '2' }}" \
             -t "${{ inputs.run_time || '1m' }}" || true
+
+      - name: Show results in run summary
+        if: always()
+        run: |
+          if [ -f results_stats.csv ]; then
+            {
+              echo "## Locust results"
+              echo '```'
+              cat results_stats.csv
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Publish report to locust-reports branch
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          if [ ! -f report.html ]; then
+            echo "No report was generated, skipping."
+            exit 0
+          fi
+          URL="https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          FOLDER="run-${{ github.run_number }}-${{ github.run_attempt }}"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git clone --depth 1 --branch locust-reports "$URL" reports-repo 2>/dev/null || {
+            mkdir reports-repo && cd reports-repo
+            git init -q -b locust-reports && git remote add origin "$URL" && cd ..
+          }
+          mkdir -p "reports-repo/$FOLDER"
+          cp report.html results_*.csv "reports-repo/$FOLDER/"
+          cd reports-repo
+          git add .
+          git commit -q -m "Locust report for run ${{ github.run_number }}"
+          git push -q origin locust-reports
+          echo "Report: https://github.com/${{ github.repository }}/tree/locust-reports/$FOLDER" >> "$GITHUB_STEP_SUMMARY"
