@@ -2,6 +2,9 @@
 
 Thank you for your interest in contributing to the Saayam DevSecOps repository.
 
+New contributors can follow the [volunteer onboarding guide](docs/ONBOARDING.md)
+for local setup, checks that do not require AWS access, and troubleshooting.
+
 ## How to Contribute
 
 1. Fork the repository
